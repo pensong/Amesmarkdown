@@ -72,12 +72,14 @@ The GUI includes:
 - file picker
 - folder picker
 - output folder selector
+- default output folder button
 - preview pane
 - conversion status log
 
 Notes:
 
 - This build uses Tkinter to stay simple and local.
+- The GUI window is fixed-size so accidental resize gestures do not change the layout.
 - On some Homebrew Python builds, Tkinter may not be bundled. If `amesmarkdown-gui` reports missing Tk support, either install a Python distribution with Tk support or use the CLI.
 - Drag-and-drop is left out of the initial version to keep setup lightweight. If you want, we can add `tkinterdnd2` next.
 

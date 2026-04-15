@@ -1,9 +1,33 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import threading
 
 from mdconvert_app.service import convert_path
+
+
+SETTINGS_DIR = Path.home() / ".amesmarkdown"
+SETTINGS_FILE = SETTINGS_DIR / "gui_settings.json"
+
+
+def load_default_output_folder() -> str:
+    try:
+        data = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return ""
+    except (OSError, json.JSONDecodeError):
+        return ""
+    value = data.get("default_output_folder", "")
+    return value if isinstance(value, str) else ""
+
+
+def save_default_output_folder(path: str) -> None:
+    SETTINGS_DIR.mkdir(parents=True, exist_ok=True)
+    SETTINGS_FILE.write_text(
+        json.dumps({"default_output_folder": path}, indent=2),
+        encoding="utf-8",
+    )
 
 
 def main() -> None:
@@ -20,9 +44,10 @@ def main() -> None:
     root.title("Amesmarkdown")
     root.tk.call("tk", "appname", "Amesmarkdown")
     root.geometry("760x520")
+    root.resizable(False, False)
 
     source_var = tk.StringVar()
-    output_var = tk.StringVar()
+    output_var = tk.StringVar(value=load_default_output_folder())
 
     def append_log(message: str) -> None:
         log.configure(state="normal")
@@ -54,6 +79,24 @@ def main() -> None:
         path = filedialog.askdirectory(title="Choose output folder")
         if path:
             output_var.set(path)
+
+    def set_default_output() -> None:
+        initial_dir = output_var.get().strip() or None
+        path = filedialog.askdirectory(
+            title="Choose default output folder",
+            initialdir=initial_dir,
+        )
+        if not path:
+            return
+        output_var.set(path)
+        try:
+            save_default_output_folder(path)
+        except OSError as exc:  # pragma: no cover - GUI path
+            messagebox.showerror("Save failed", f"Could not save the default output folder.\n\n{exc}")
+            append_log(f"Failed to save default output folder: {exc}")
+            return
+        append_log(f"Default output folder set to {path}")
+        messagebox.showinfo("Default output saved", f"Default output folder set to:\n{path}")
 
     def preview_selected() -> None:
         source_text = source_var.get().strip()
@@ -121,6 +164,7 @@ def main() -> None:
     tk.Label(root, text="Output Folder").grid(row=1, column=0, padx=12, pady=6, sticky="w")
     tk.Entry(root, textvariable=output_var).grid(row=1, column=1, padx=12, pady=6, sticky="ew")
     tk.Button(root, text="Choose Output", command=choose_output).grid(row=1, column=2, padx=12, pady=6)
+    tk.Button(root, text="Set as Default", command=set_default_output).grid(row=1, column=3, padx=(0, 12), pady=6)
 
     button_row = tk.Frame(root)
     button_row.grid(row=2, column=0, columnspan=4, padx=12, pady=8, sticky="w")
