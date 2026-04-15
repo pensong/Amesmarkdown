@@ -1,0 +1,7 @@
+[console_scripts]
+amesmarkdown = mdconvert_app.cli:main
+amesmarkdown-gui = mdconvert_app.gui:main
+amesmarkdown-menubar = mdconvert_app.menubar_app:main
+mdconvert = mdconvert_app.cli:main
+mdconvert-gui = mdconvert_app.gui:main
+mdconvert-menubar = mdconvert_app.menubar_app:main

@@ -1,0 +1,92 @@
+Metadata-Version: 2.4
+Name: mdconvert
+Version: 0.1.0
+Summary: Local macOS Office-to-Markdown converter with CLI and simple GUI
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: openpyxl>=3.1.5
+Requires-Dist: python-docx>=1.1.2
+Requires-Dist: python-pptx>=1.0.2
+
+# mdconvert
+
+`mdconvert` is a local macOS-friendly Python app that converts Microsoft Office files into Markdown. It includes:
+
+- A CLI for converting individual files or whole folders
+- A small GUI for choosing files/folders, previewing Markdown, and saving results locally
+- Asset extraction so embedded images are exported into `assets/<document-name>/`
+
+## Supported input
+
+- `.docx`
+- `.pptx`
+- `.xlsx`
+
+## Output behavior
+
+- Writes `.md` files
+- Exports embedded images into an `assets/` folder next to the Markdown file
+- Preserves common structure:
+  - headings
+  - lists
+  - tables
+  - images
+
+## Install
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+## CLI
+
+Single file:
+
+```bash
+mdconvert input.docx output.md
+```
+
+Single file to output directory:
+
+```bash
+mdconvert input.docx ./output_dir
+```
+
+Folder mode:
+
+```bash
+mdconvert ./input_folder ./output_folder
+```
+
+## GUI
+
+```bash
+mdconvert-gui
+```
+
+The GUI includes:
+
+- file picker
+- folder picker
+- output folder selector
+- preview pane
+- conversion status log
+
+Notes:
+
+- This build uses Tkinter to stay simple and local.
+- On some Homebrew Python builds, Tkinter may not be bundled. If `mdconvert-gui` reports missing Tk support, either install a Python distribution with Tk support or use the CLI.
+- Drag-and-drop is left out of the initial version to keep setup lightweight. If you want, we can add `tkinterdnd2` next.
+
+## Project layout
+
+```text
+src/mdconvert_app/
+  cli.py
+  gui.py
+  service.py
+  converters/
+tests/
+```

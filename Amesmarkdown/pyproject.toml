@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Amesmarkdown"
+version = "0.1.0"
+description = "Amesmarkdown local macOS Office-to-Markdown converter with CLI, GUI, and menu bar app"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "openpyxl>=3.1.5",
+  "python-docx>=1.1.2",
+  "python-pptx>=1.0.2",
+  "rumps>=0.4.0",
+]
+
+[project.scripts]
+amesmarkdown = "mdconvert_app.cli:main"
+amesmarkdown-gui = "mdconvert_app.gui:main"
+amesmarkdown-menubar = "mdconvert_app.menubar_app:main"
+mdconvert = "mdconvert_app.cli:main"
+mdconvert-gui = "mdconvert_app.gui:main"
+mdconvert-menubar = "mdconvert_app.menubar_app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

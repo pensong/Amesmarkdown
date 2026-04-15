@@ -1,0 +1,3 @@
+[console_scripts]
+mdconvert = mdconvert_app.cli:main
+mdconvert-gui = mdconvert_app.gui:main
