@@ -4,7 +4,6 @@
 
 - A CLI for converting individual files or whole folders
 - A small GUI for choosing files/folders, previewing Markdown, and saving results locally
-- A menu bar app for quick conversions from the macOS status bar
 - Asset extraction so embedded images are exported into `assets/<document-name>/`
 
 ## Supported input
