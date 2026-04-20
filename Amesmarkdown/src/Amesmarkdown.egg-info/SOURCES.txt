@@ -16,6 +16,9 @@ src/mdconvert_app/models.py
 src/mdconvert_app/service.py
 src/mdconvert_app/converters/__init__.py
 src/mdconvert_app/converters/docx_converter.py
+src/mdconvert_app/converters/pdf_converter.py
 src/mdconvert_app/converters/pptx_converter.py
 src/mdconvert_app/converters/xlsx_converter.py
+tests/test_gui_settings.py
 tests/test_markdown_utils.py
+tests/test_service.py

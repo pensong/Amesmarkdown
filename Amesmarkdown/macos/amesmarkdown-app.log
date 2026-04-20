@@ -1,1 +1,25 @@
 2026-04-15 16:12:26.626 Python[8673:225641] error messaging the mach port for IMKCFRunLoopWakeUpReliable
+Exception in Tkinter callback
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/tkinter/__init__.py", line 2079, in __call__
+    return self.func(*args)
+           ~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/tkinter/__init__.py", line 862, in callit
+    func(*args)
+    ~~~~^^^^^^^
+  File "/Users/pensong/Documents/Amesmarkdown/src/mdconvert_app/gui.py", line 138, in <lambda>
+    root.after(0, lambda: append_log(f"Conversion failed: {exc}"))
+                                                           ^^^
+NameError: cannot access free variable 'exc' where it is not associated with a value in enclosing scope. Did you mean: 'exec'?
+Exception in Tkinter callback
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/tkinter/__init__.py", line 2079, in __call__
+    return self.func(*args)
+           ~~~~~~~~~^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/tkinter/__init__.py", line 862, in callit
+    func(*args)
+    ~~~~^^^^^^^
+  File "/Users/pensong/Documents/Amesmarkdown/src/mdconvert_app/gui.py", line 139, in <lambda>
+    root.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
+                                                                        ^^^
+NameError: cannot access free variable 'exc' where it is not associated with a value in enclosing scope. Did you mean: 'exec'?

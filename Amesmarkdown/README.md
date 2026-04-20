@@ -1,6 +1,6 @@
 # Amesmarkdown
 
-`Amesmarkdown` is a local macOS-friendly Python app that converts Microsoft Office files into Markdown. It includes:
+`Amesmarkdown` is a local macOS-friendly Python app that converts Microsoft Office files, PDF documents, and Markdown across common document formats. It includes:
 
 - A CLI for converting individual files or whole folders
 - A small GUI for choosing files/folders, previewing Markdown, and saving results locally
@@ -9,13 +9,16 @@
 
 ## Supported input
 
+- `.md`
 - `.docx`
+- `.pdf`
 - `.pptx`
 - `.xlsx`
 
 ## Output behavior
 
-- Writes `.md` files
+- Converts `.docx`, `.pdf`, `.pptx`, and `.xlsx` into `.md`
+- Converts `.md` into `.docx`, `.pptx`, `.xlsx`, or `.pdf`
 - Exports embedded images into an `assets/` folder next to the Markdown file
 - Preserves common structure:
   - headings
@@ -49,6 +52,18 @@ Single file:
 amesmarkdown input.docx output.md
 ```
 
+Markdown to Word:
+
+```bash
+amesmarkdown notes.md report.docx
+```
+
+Markdown to PowerPoint using an output directory:
+
+```bash
+amesmarkdown slides.md ./exports --to pptx
+```
+
 Single file to output directory:
 
 ```bash
@@ -59,6 +74,18 @@ Folder mode:
 
 ```bash
 amesmarkdown ./input_folder ./output_folder
+```
+
+Markdown folder to PDF folder:
+
+```bash
+amesmarkdown ./markdown_folder ./pdf_output --to pdf
+```
+
+PDF example:
+
+```bash
+amesmarkdown input.pdf output.md
 ```
 
 ## GUI
@@ -72,9 +99,12 @@ The GUI includes:
 - file picker
 - folder picker
 - output folder selector
+- output format selector
 - default output folder button
 - preview pane
 - conversion status log
+
+The main window also shows a short supported-format hint so users can quickly see that Markdown, Word, PowerPoint, Excel, and PDF files are accepted.
 
 Notes:
 

@@ -38,7 +38,7 @@ def main() -> None:
             self._start_conversion(source_path, output_dir)
 
         def convert_folder(self, _: object) -> None:
-            source_dir = self._choose_directory(title="Choose a folder with Office files")
+            source_dir = self._choose_directory(title="Choose a folder with supported files")
             if not source_dir:
                 return
             output_dir = self._choose_output_dir(default=source_dir / "markdown-output")
@@ -78,7 +78,7 @@ def main() -> None:
                         rumps.notification(
                             "Amesmarkdown",
                             "No supported files found",
-                            f"No .docx, .pptx, or .xlsx files were found in {source}",
+                            f"No .docx, .pptx, .xlsx, or .pdf files were found in {source}",
                         )
 
             threading.Thread(target=worker, daemon=True).start()
@@ -86,7 +86,7 @@ def main() -> None:
         def _choose_file(self) -> Optional[Path]:
             return self._run_file_dialog(
                 chooser=self._ask_open_file,
-                title="Choose an Office file",
+                title="Choose a supported file",
                 initial_dir=None,
             )
 
@@ -130,7 +130,7 @@ def main() -> None:
             options = {
                 "title": title,
                 "filetypes": [
-                    ("Office files", "*.docx *.pptx *.xlsx"),
+                    ("Supported files", "*.docx *.pptx *.xlsx *.pdf"),
                     ("All files", "*.*"),
                 ],
             }

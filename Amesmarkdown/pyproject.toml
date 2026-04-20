@@ -4,12 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Amesmarkdown"
-version = "0.2.0"
-description = "Amesmarkdown local macOS Office-to-Markdown converter with CLI, GUI, and menu bar app"
+version = "0.4.0"
+description = "Amesmarkdown local macOS document and Markdown conversion app with CLI, GUI, and menu bar app"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
   "openpyxl>=3.1.5",
+  "pypdf>=5.4.0",
   "python-docx>=1.1.2",
   "python-pptx>=1.0.2",
   "rumps>=0.4.0",

@@ -11,10 +11,16 @@ from mdconvert_app.service import SUPPORTED_EXTENSIONS, convert_path
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="amesmarkdown",
-        description="Convert local Office files (.docx, .pptx, .xlsx) into Markdown.",
+        description="Convert supported Office, PDF, and Markdown files between Markdown and common document formats.",
     )
     parser.add_argument("source", help="Input file or directory")
-    parser.add_argument("output", help="Output .md file or output directory")
+    parser.add_argument("output", help="Output file or output directory")
+    parser.add_argument(
+        "--to",
+        dest="target_format",
+        choices=["md", "docx", "pptx", "xlsx", "pdf"],
+        help="Target format when the output path is a directory. Required for Markdown input.",
+    )
     return parser
 
 
@@ -31,9 +37,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     if source.is_file() and source.suffix.lower() not in SUPPORTED_EXTENSIONS:
         parser.error(f"Unsupported file type: {source.suffix}")
 
-    results = convert_path(source, output)
+    target_format = args.target_format
+    if source.is_file() and source.suffix.lower() == ".md" and output.suffix.lower() not in {".docx", ".pptx", ".xlsx", ".pdf"} and not target_format:
+        parser.error("Markdown input requires --to when the output path is a directory.")
+
+    try:
+        results = convert_path(source, output, target_format=target_format)
+    except ValueError as exc:
+        parser.error(str(exc))
+
     if not results:
-        print("No supported Office files were found.", file=sys.stderr)
+        print("No supported files were found for the requested conversion.", file=sys.stderr)
         return 1
 
     for result in results:

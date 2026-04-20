@@ -4,6 +4,13 @@ from mdconvert_app import gui
 
 
 class GuiSettingsTests(unittest.TestCase):
+    def test_supported_formats_text_mentions_pdf(self) -> None:
+        self.assertIn(".pdf", gui.SUPPORTED_FORMATS_TEXT)
+        self.assertIn(".md", gui.SUPPORTED_FORMATS_TEXT)
+
+    def test_output_formats_include_docx_export(self) -> None:
+        self.assertEqual(gui.OUTPUT_FORMATS["Word (.docx)"], ".docx")
+
     def test_load_default_output_folder_returns_empty_for_missing_file(self) -> None:
         from tempfile import TemporaryDirectory
 

@@ -9,6 +9,16 @@ from mdconvert_app.service import convert_path
 
 SETTINGS_DIR = Path.home() / ".amesmarkdown"
 SETTINGS_FILE = SETTINGS_DIR / "gui_settings.json"
+OUTPUT_FORMATS = {
+    "Markdown (.md)": ".md",
+    "Word (.docx)": ".docx",
+    "PowerPoint (.pptx)": ".pptx",
+    "Excel (.xlsx)": ".xlsx",
+    "PDF (.pdf)": ".pdf",
+}
+SUPPORTED_FORMATS_TEXT = (
+    "Supported input formats: Markdown (.md), Word (.docx), PowerPoint (.pptx), Excel (.xlsx), PDF (.pdf)."
+)
 
 
 def load_default_output_folder() -> str:
@@ -48,6 +58,7 @@ def main() -> None:
 
     source_var = tk.StringVar()
     output_var = tk.StringVar(value=load_default_output_folder())
+    format_var = tk.StringVar(value="Markdown (.md)")
 
     def append_log(message: str) -> None:
         log.configure(state="normal")
@@ -57,9 +68,9 @@ def main() -> None:
 
     def choose_file() -> None:
         path = filedialog.askopenfilename(
-            title="Choose an Office file",
+            title="Choose a supported file",
             filetypes=[
-                ("Office files", "*.docx *.pptx *.xlsx"),
+                ("Supported files", "*.md *.docx *.pptx *.xlsx *.pdf"),
                 ("All files", "*.*"),
             ],
         )
@@ -69,7 +80,7 @@ def main() -> None:
                 output_var.set(str(Path(path).with_suffix("").parent / "markdown-output"))
 
     def choose_folder() -> None:
-        path = filedialog.askdirectory(title="Choose a folder with Office files")
+        path = filedialog.askdirectory(title="Choose a folder with supported files")
         if path:
             source_var.set(path)
             if not output_var.get():
@@ -107,9 +118,23 @@ def main() -> None:
         if source.is_dir():
             messagebox.showinfo("Folder selected", "Preview is only available for single files.")
             return
+        if source.suffix.lower() == ".md":
+            try:
+                markdown_text = source.read_text(encoding="utf-8")
+            except OSError as exc:  # pragma: no cover - GUI path
+                messagebox.showerror("Preview failed", str(exc))
+                append_log(f"Preview failed: {exc}")
+                return
+            preview.configure(state="normal")
+            preview.delete("1.0", "end")
+            preview.insert("1.0", markdown_text)
+            preview.configure(state="disabled")
+            append_log(f"Preview refreshed for {source.name}")
+            return
+
         destination = Path(output_var.get().strip() or source.parent / "markdown-output")
         try:
-            result = convert_path(source, destination)[0]
+            result = convert_path(source, destination, target_format=OUTPUT_FORMATS[format_var.get()])[0]
         except Exception as exc:  # pragma: no cover - GUI path
             messagebox.showerror("Preview failed", str(exc))
             append_log(f"Preview failed: {exc}")
@@ -132,10 +157,15 @@ def main() -> None:
 
         def worker() -> None:
             try:
-                results = convert_path(Path(source_text), Path(output_text))
+                results = convert_path(
+                    Path(source_text),
+                    Path(output_text),
+                    target_format=OUTPUT_FORMATS[format_var.get()],
+                )
             except Exception as exc:  # pragma: no cover - GUI path
-                root.after(0, lambda: append_log(f"Conversion failed: {exc}"))
-                root.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
+                error_message = str(exc)
+                root.after(0, lambda message=error_message: append_log(f"Conversion failed: {message}"))
+                root.after(0, lambda message=error_message: messagebox.showerror("Conversion failed", message))
             else:
                 def complete() -> None:
                     for item in results:
@@ -153,8 +183,8 @@ def main() -> None:
         threading.Thread(target=worker, daemon=True).start()
 
     root.columnconfigure(1, weight=1)
-    root.rowconfigure(4, weight=1)
     root.rowconfigure(6, weight=1)
+    root.rowconfigure(7, weight=1)
 
     tk.Label(root, text="Source").grid(row=0, column=0, padx=12, pady=(12, 6), sticky="w")
     tk.Entry(root, textvariable=source_var).grid(row=0, column=1, padx=12, pady=(12, 6), sticky="ew")
@@ -166,25 +196,34 @@ def main() -> None:
     tk.Button(root, text="Choose Output", command=choose_output).grid(row=1, column=2, padx=12, pady=6)
     tk.Button(root, text="Set as Default", command=set_default_output).grid(row=1, column=3, padx=(0, 12), pady=6)
 
+    tk.Label(root, text="Output Format").grid(row=2, column=0, padx=12, pady=6, sticky="w")
+    tk.OptionMenu(root, format_var, *OUTPUT_FORMATS.keys()).grid(row=2, column=1, padx=12, pady=6, sticky="w")
+
     button_row = tk.Frame(root)
-    button_row.grid(row=2, column=0, columnspan=4, padx=12, pady=8, sticky="w")
+    button_row.grid(row=3, column=0, columnspan=4, padx=12, pady=8, sticky="w")
     tk.Button(button_row, text="Preview", command=preview_selected).pack(side="left")
     convert_button = tk.Button(button_row, text="Convert", command=do_convert)
     convert_button.pack(side="left", padx=8)
 
     tk.Label(
         root,
-        text="Drag and drop can be added later with tkinterdnd2; this version keeps the GUI dependency-light.",
+        text=SUPPORTED_FORMATS_TEXT,
         anchor="w",
-    ).grid(row=3, column=0, columnspan=4, padx=12, pady=(0, 8), sticky="ew")
+    ).grid(row=4, column=0, columnspan=4, padx=12, pady=(0, 4), sticky="ew")
 
-    tk.Label(root, text="Preview").grid(row=4, column=0, padx=12, sticky="nw")
+    tk.Label(
+        root,
+        text="Choose a source file or folder, then pick the output format you want to generate.",
+        anchor="w",
+    ).grid(row=5, column=0, columnspan=4, padx=12, pady=(0, 8), sticky="ew")
+
+    tk.Label(root, text="Preview").grid(row=6, column=0, padx=12, sticky="nw")
     preview = scrolledtext.ScrolledText(root, wrap="word", state="disabled", height=12)
-    preview.grid(row=4, column=1, columnspan=3, padx=12, pady=(0, 12), sticky="nsew")
+    preview.grid(row=6, column=1, columnspan=3, padx=12, pady=(0, 12), sticky="nsew")
 
-    tk.Label(root, text="Status").grid(row=6, column=0, padx=12, sticky="nw")
+    tk.Label(root, text="Status").grid(row=7, column=0, padx=12, sticky="nw")
     log = scrolledtext.ScrolledText(root, wrap="word", state="disabled", height=8)
-    log.grid(row=6, column=1, columnspan=3, padx=12, pady=(0, 12), sticky="nsew")
+    log.grid(row=7, column=1, columnspan=3, padx=12, pady=(0, 12), sticky="nsew")
 
     root.mainloop()
 
